@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { debug } from 'playwright-core/lib/utilsBundle';
 import { FullConfig } from './config';
 import { Context } from './context';
 import { logUnhandledError } from '../log';
@@ -27,6 +28,8 @@ import type { BrowserContextFactory } from './browserContextFactory';
 import type * as mcpServer from '../sdk/server';
 import type { ServerBackend } from '../sdk/server';
 
+const backendDebug = debug('pw:mcp:backend');
+
 export class BrowserServerBackend implements ServerBackend {
   private _tools: Tool[];
   private _context: Context | undefined;
@@ -38,6 +41,8 @@ export class BrowserServerBackend implements ServerBackend {
     this._config = config;
     this._browserContextFactory = factory;
     this._tools = filteredTools(config);
+    backendDebug(`BrowserServerBackend initialized with ${this._tools.length} tools`);
+    backendDebug(`Tool names: ${this._tools.map(t => t.schema.name).join(', ')}`);
   }
 
   async initialize(server: mcpServer.Server, clientInfo: mcpServer.ClientInfo): Promise<void> {
