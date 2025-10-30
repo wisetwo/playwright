@@ -16,7 +16,7 @@
 
 import * as React from 'react';
 import { clsx } from '@web/uiUtils';
-import { hashStringToInt } from './utils';
+import { formatUrl, hashStringToInt } from './utils';
 import { navigate, ProjectLink, SearchParamsContext } from './links';
 import { filterWithQuery } from './filter';
 import './labels.css';
@@ -33,7 +33,7 @@ export const Label: React.FC<{
   </span>;
 
   return href
-    ? <a className='label-anchor' href={href}>{baseLabel}</a>
+    ? <a className='label-anchor' href={formatUrl(href)}>{baseLabel}</a>
     : baseLabel;
 };
 
@@ -60,8 +60,7 @@ const LabelsClickView: React.FC<{
 
   const onClickHandle = React.useCallback((e: React.MouseEvent, label: string) => {
     e.preventDefault();
-    const q = searchParams.get('q')?.toString() || '';
-    navigate(filterWithQuery(q, label, e.metaKey || e.ctrlKey));
+    navigate(filterWithQuery(searchParams, label, e.metaKey || e.ctrlKey));
   }, [searchParams]);
 
   return <>
