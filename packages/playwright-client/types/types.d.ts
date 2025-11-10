@@ -5168,13 +5168,6 @@ export interface Page {
   workers(): Array<Worker>;
 
   /**
-   * @deprecated This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to
-   * test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration
-   * with Axe.
-   */
-  accessibility: Accessibility;
-
-  /**
    * Playwright has ability to mock clock and passage of time.
    */
   clock: Clock;
@@ -11212,6 +11205,12 @@ export interface ElementHandle<T=Node> extends JSHandle<T> {
     };
 
     /**
+     * Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor
+     * position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+     */
+    steps?: number;
+
+    /**
      * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
      * option in the config, or by using the
      * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
@@ -11293,6 +11292,12 @@ export interface ElementHandle<T=Node> extends JSHandle<T> {
 
       y: number;
     };
+
+    /**
+     * Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor
+     * position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+     */
+    steps?: number;
 
     /**
      * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
@@ -12789,6 +12794,12 @@ export interface Locator {
     };
 
     /**
+     * Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor
+     * position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+     */
+    steps?: number;
+
+    /**
      * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
      * option in the config, or by using the
      * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
@@ -12904,6 +12915,12 @@ export interface Locator {
 
       y: number;
     };
+
+    /**
+     * Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor
+     * position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
+     */
+    steps?: number;
 
     /**
      * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
@@ -15746,97 +15763,6 @@ export namespace errors {
 class TimeoutError extends Error {
 }
 
-}
-
-/**
- * The Accessibility class provides methods for inspecting Chromium's accessibility tree. The accessibility tree is
- * used by assistive technology such as [screen readers](https://en.wikipedia.org/wiki/Screen_reader) or
- * [switches](https://en.wikipedia.org/wiki/Switch_access).
- *
- * Accessibility is a very platform-specific thing. On different platforms, there are different screen readers that
- * might have wildly different output.
- *
- * Rendering engines of Chromium, Firefox and WebKit have a concept of "accessibility tree", which is then translated
- * into different platform-specific APIs. Accessibility namespace gives access to this Accessibility Tree.
- *
- * Most of the accessibility tree gets filtered out when converting from internal browser AX Tree to Platform-specific
- * AX-Tree or by assistive technologies themselves. By default, Playwright tries to approximate this filtering,
- * exposing only the "interesting" nodes of the tree.
- */
-export interface Accessibility {
-  /**
-   * Captures the current state of the accessibility tree. The returned object represents the root accessible node of
-   * the page.
-   *
-   * **NOTE** The Chromium accessibility tree contains nodes that go unused on most platforms and by most screen
-   * readers. Playwright will discard them as well for an easier to process tree, unless
-   * [`interestingOnly`](https://playwright.dev/docs/api/class-accessibility#accessibility-snapshot-option-interesting-only)
-   * is set to `false`.
-   *
-   * **Usage**
-   *
-   * An example of dumping the entire accessibility tree:
-   *
-   * ```js
-   * const snapshot = await page.accessibility.snapshot();
-   * console.log(snapshot);
-   * ```
-   *
-   * An example of logging the focused node's name:
-   *
-   * ```js
-   * const snapshot = await page.accessibility.snapshot();
-   * const node = findFocusedNode(snapshot);
-   * console.log(node && node.name);
-   *
-   * function findFocusedNode(node) {
-   *   if (node.focused)
-   *     return node;
-   *   for (const child of node.children || []) {
-   *     const foundNode = findFocusedNode(child);
-   *     if (foundNode)
-   *       return foundNode;
-   *   }
-   *   return null;
-   * }
-   * ```
-   *
-   * @deprecated This method is deprecated. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test
-   * page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with
-   * Axe.
-   * @param options
-   */
-  snapshot(options?: AccessibilitySnapshotOptions): Promise<null|AccessibilityNode>;
-
-}
-
-type AccessibilityNode = {
-  role: string;
-  name: string;
-  value?: string|number;
-  description?: string;
-  keyshortcuts?: string;
-  roledescription?: string;
-  valuetext?: string;
-  disabled?: boolean;
-  expanded?: boolean;
-  focused?: boolean;
-  modal?: boolean;
-  multiline?: boolean;
-  multiselectable?: boolean;
-  readonly?: boolean;
-  required?: boolean;
-  selected?: boolean;
-  checked?: boolean|"mixed";
-  pressed?: boolean|"mixed";
-  level?: number;
-  valuemin?: number;
-  valuemax?: number;
-  autocomplete?: string;
-  haspopup?: string;
-  invalid?: string;
-  orientation?: string;
-  children?: AccessibilityNode[];
 }
 
 export const devices: Devices;
@@ -20293,7 +20219,8 @@ export interface Mouse {
    */
   move(x: number, y: number, options?: {
     /**
-     * Defaults to 1. Sends intermediate `mousemove` events.
+     * Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor
+     * position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
      */
     steps?: number;
   }): Promise<void>;
@@ -21741,18 +21668,6 @@ export interface WebSocket {
    */
   waitForEvent(event: 'socketerror', optionsOrPredicate?: { predicate?: (string: string) => boolean | Promise<boolean>, timeout?: number } | ((string: string) => boolean | Promise<boolean>)): Promise<string>;
 
-}
-
-interface AccessibilitySnapshotOptions {
-  /**
-   * Prune uninteresting nodes from the tree. Defaults to `true`.
-   */
-  interestingOnly?: boolean;
-
-  /**
-   * The root DOM element for the snapshot. Defaults to the whole page.
-   */
-  root?: ElementHandle;
 }
 
 export interface LaunchOptions {

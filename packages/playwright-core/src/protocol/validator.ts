@@ -97,35 +97,6 @@ scheme.SelectorEngine = tObject({
   source: tString,
   contentScript: tOptional(tBoolean),
 });
-scheme.AXNode = tObject({
-  role: tString,
-  name: tString,
-  valueString: tOptional(tString),
-  valueNumber: tOptional(tFloat),
-  description: tOptional(tString),
-  keyshortcuts: tOptional(tString),
-  roledescription: tOptional(tString),
-  valuetext: tOptional(tString),
-  disabled: tOptional(tBoolean),
-  expanded: tOptional(tBoolean),
-  focused: tOptional(tBoolean),
-  modal: tOptional(tBoolean),
-  multiline: tOptional(tBoolean),
-  multiselectable: tOptional(tBoolean),
-  readonly: tOptional(tBoolean),
-  required: tOptional(tBoolean),
-  selected: tOptional(tBoolean),
-  checked: tOptional(tEnum(['checked', 'unchecked', 'mixed'])),
-  pressed: tOptional(tEnum(['pressed', 'released', 'mixed'])),
-  level: tOptional(tInt),
-  valuemin: tOptional(tFloat),
-  valuemax: tOptional(tFloat),
-  autocomplete: tOptional(tString),
-  haspopup: tOptional(tString),
-  invalid: tOptional(tString),
-  orientation: tOptional(tString),
-  children: tOptional(tArray(tType('AXNode'))),
-});
 scheme.SetNetworkCookie = tObject({
   name: tString,
   value: tString,
@@ -1425,13 +1396,6 @@ scheme.PageTouchscreenTapParams = tObject({
   y: tFloat,
 });
 scheme.PageTouchscreenTapResult = tOptional(tObject({}));
-scheme.PageAccessibilitySnapshotParams = tObject({
-  interestingOnly: tOptional(tBoolean),
-  root: tOptional(tChannel(['ElementHandle'])),
-});
-scheme.PageAccessibilitySnapshotResult = tObject({
-  rootAXNode: tOptional(tType('AXNode')),
-});
 scheme.PagePageErrorsParams = tOptional(tObject({}));
 scheme.PagePageErrorsResult = tObject({
   errors: tArray(tType('SerializedError')),
@@ -1466,11 +1430,11 @@ scheme.PageRequestsResult = tObject({
 });
 scheme.PageSnapshotForAIParams = tObject({
   track: tOptional(tString),
-  mode: tOptional(tEnum(['full', 'incremental'])),
   timeout: tFloat,
 });
 scheme.PageSnapshotForAIResult = tObject({
-  snapshot: tString,
+  full: tString,
+  incremental: tOptional(tString),
 });
 scheme.PageStartJSCoverageParams = tObject({
   resetOnNavigation: tOptional(tBoolean),
@@ -1602,6 +1566,7 @@ scheme.FrameClickParams = tObject({
   clickCount: tOptional(tInt),
   timeout: tFloat,
   trial: tOptional(tBoolean),
+  steps: tOptional(tInt),
 });
 scheme.FrameClickResult = tOptional(tObject({}));
 scheme.FrameContentParams = tOptional(tObject({}));
@@ -1629,6 +1594,7 @@ scheme.FrameDblclickParams = tObject({
   button: tOptional(tEnum(['left', 'right', 'middle'])),
   timeout: tFloat,
   trial: tOptional(tBoolean),
+  steps: tOptional(tInt),
 });
 scheme.FrameDblclickResult = tOptional(tObject({}));
 scheme.FrameDispatchEventParams = tObject({
@@ -2044,6 +2010,7 @@ scheme.ElementHandleClickParams = tObject({
   clickCount: tOptional(tInt),
   timeout: tFloat,
   trial: tOptional(tBoolean),
+  steps: tOptional(tInt),
 });
 scheme.ElementHandleClickResult = tOptional(tObject({}));
 scheme.ElementHandleContentFrameParams = tOptional(tObject({}));
@@ -2058,6 +2025,7 @@ scheme.ElementHandleDblclickParams = tObject({
   button: tOptional(tEnum(['left', 'right', 'middle'])),
   timeout: tFloat,
   trial: tOptional(tBoolean),
+  steps: tOptional(tInt),
 });
 scheme.ElementHandleDblclickResult = tOptional(tObject({}));
 scheme.ElementHandleDispatchEventParams = tObject({

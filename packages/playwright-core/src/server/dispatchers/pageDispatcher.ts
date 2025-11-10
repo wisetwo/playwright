@@ -328,14 +328,6 @@ export class PageDispatcher extends Dispatcher<Page, channels.PageChannel, Brows
     await this._page.touchscreen.tap(progress, params.x, params.y);
   }
 
-  async accessibilitySnapshot(params: channels.PageAccessibilitySnapshotParams, progress: Progress): Promise<channels.PageAccessibilitySnapshotResult> {
-    const rootAXNode = await progress.race(this._page.accessibility.snapshot({
-      interestingOnly: params.interestingOnly,
-      root: params.root ? (params.root as ElementHandleDispatcher)._elementHandle : undefined
-    }));
-    return { rootAXNode: rootAXNode || undefined };
-  }
-
   async pdf(params: channels.PagePdfParams, progress: Progress): Promise<channels.PagePdfResult> {
     if (!this._page.pdf)
       throw new Error('PDF generation is only supported for Headless Chromium');
@@ -352,7 +344,7 @@ export class PageDispatcher extends Dispatcher<Page, channels.PageChannel, Brows
   }
 
   async snapshotForAI(params: channels.PageSnapshotForAIParams, progress: Progress): Promise<channels.PageSnapshotForAIResult> {
-    return { snapshot: await this._page.snapshotForAI(progress, params) };
+    return await this._page.snapshotForAI(progress, params);
   }
 
   async bringToFront(params: channels.PageBringToFrontParams, progress: Progress): Promise<void> {
