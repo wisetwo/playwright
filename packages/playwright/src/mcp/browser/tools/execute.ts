@@ -22,9 +22,9 @@ const executePlaywrightCode = defineTabTool({
   schema: {
     name: 'browser_execute_playwright_code',
     title: 'Execute Playwright code',
-    description: 'Execute Playwright API code directly on the current page. Can execute multiple lines of code from test files like: await page.goto(url), await page.click(selector), await page.fill(selector, text), etc. Use this to execute code from test files line by line.',
+    description: 'Execute Playwright API code on the current page',
     inputSchema: z.object({
-      code: z.string().describe('One or more lines of Playwright code to execute. Can include await statements. Examples: "await page.goto(\'https://example.com\')" or "await page.getByRole(\'button\', { name: \'Submit\' }).click();" or multiple lines separated by semicolons.'),
+      code: z.string().describe('One or more lines of Playwright code to execute. Can include await statements.'),
     }),
     type: 'action',
   },
