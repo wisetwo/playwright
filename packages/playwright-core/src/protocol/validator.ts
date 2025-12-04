@@ -317,6 +317,7 @@ scheme.LocalUtilsConnectResult = tObject({
 scheme.LocalUtilsTracingStartedParams = tObject({
   tracesDir: tOptional(tString),
   traceName: tString,
+  live: tOptional(tBoolean),
 });
 scheme.LocalUtilsTracingStartedResult = tObject({
   stacksId: tString,
@@ -505,7 +506,6 @@ scheme.BrowserTypeLaunchParams = tObject({
   timeout: tFloat,
   env: tOptional(tArray(tType('NameValue'))),
   headless: tOptional(tBoolean),
-  devtools: tOptional(tBoolean),
   proxy: tOptional(tObject({
     server: tString,
     bypass: tOptional(tString),
@@ -535,7 +535,6 @@ scheme.BrowserTypeLaunchPersistentContextParams = tObject({
   timeout: tFloat,
   env: tOptional(tArray(tType('NameValue'))),
   headless: tOptional(tBoolean),
-  devtools: tOptional(tBoolean),
   proxy: tOptional(tObject({
     server: tString,
     bypass: tOptional(tString),
@@ -810,12 +809,14 @@ scheme.EventTargetWaitForEventInfoParams = tObject({
 });
 scheme.BrowserContextWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
 scheme.PageWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
+scheme.WorkerWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
 scheme.WebSocketWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
 scheme.ElectronApplicationWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
 scheme.AndroidDeviceWaitForEventInfoParams = tType('EventTargetWaitForEventInfoParams');
 scheme.EventTargetWaitForEventInfoResult = tOptional(tObject({}));
 scheme.BrowserContextWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
 scheme.PageWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
+scheme.WorkerWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
 scheme.WebSocketWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
 scheme.ElectronApplicationWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
 scheme.AndroidDeviceWaitForEventInfoResult = tType('EventTargetWaitForEventInfoResult');
@@ -894,7 +895,8 @@ scheme.BrowserContextConsoleEvent = tObject({
     lineNumber: tInt,
     columnNumber: tInt,
   }),
-  page: tChannel(['Page']),
+  page: tOptional(tChannel(['Page'])),
+  worker: tOptional(tChannel(['Worker'])),
 });
 scheme.BrowserContextCloseEvent = tOptional(tObject({}));
 scheme.BrowserContextDialogEvent = tObject({
@@ -1582,6 +1584,7 @@ scheme.FrameDragAndDropParams = tObject({
   sourcePosition: tOptional(tType('Point')),
   targetPosition: tOptional(tType('Point')),
   strict: tOptional(tBoolean),
+  steps: tOptional(tInt),
 });
 scheme.FrameDragAndDropResult = tOptional(tObject({}));
 scheme.FrameDblclickParams = tObject({
@@ -1913,6 +1916,11 @@ scheme.WorkerEvaluateExpressionHandleParams = tObject({
 scheme.WorkerEvaluateExpressionHandleResult = tObject({
   handle: tChannel(['ElementHandle', 'JSHandle']),
 });
+scheme.WorkerUpdateSubscriptionParams = tObject({
+  event: tEnum(['console']),
+  enabled: tBoolean,
+});
+scheme.WorkerUpdateSubscriptionResult = tOptional(tObject({}));
 scheme.JSHandleInitializer = tObject({
   preview: tString,
 });

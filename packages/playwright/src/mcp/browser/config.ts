@@ -46,6 +46,7 @@ export type CLIOptions = {
   host?: string;
   ignoreHttpsErrors?: boolean;
   initScript?: string[];
+  initPage?: string[];
   isolated?: boolean;
   imageResponses?: 'allow' | 'omit';
   sandbox?: boolean;
@@ -58,6 +59,7 @@ export type CLIOptions = {
   saveVideo?: ViewportSize;
   secrets?: Record<string, string>;
   sharedBrowserContext?: boolean;
+  snapshotMode?: 'incremental' | 'full' | 'none';
   storageState?: string;
   testIdAttribute?: string;
   timeoutAction?: number;
@@ -85,6 +87,9 @@ export const defaultConfig: FullConfig = {
   },
   server: {},
   saveTrace: false,
+  snapshot: {
+    mode: 'incremental',
+  },
   timeouts: {
     action: 5000,
     navigation: 60000,
@@ -102,6 +107,9 @@ export type FullConfig = Config & {
   network: NonNullable<Config['network']>,
   saveTrace: boolean;
   server: NonNullable<Config['server']>,
+  snapshot: {
+    mode: 'incremental' | 'full' | 'none';
+  },
   timeouts: {
     action: number;
     navigation: number;
@@ -129,6 +137,12 @@ async function validateConfig(config: FullConfig): Promise<void> {
     for (const script of config.browser.initScript) {
       if (!await fileExistsAsync(script))
         throw new Error(`Init script file does not exist: ${script}`);
+    }
+  }
+  if (config.browser.initPage) {
+    for (const page of config.browser.initPage) {
+      if (!await fileExistsAsync(page))
+        throw new Error(`Init page file does not exist: ${page}`);
     }
   }
   if (config.sharedBrowserContext && config.saveVideo)
@@ -218,6 +232,7 @@ export function configFromCLIOptions(cliOptions: CLIOptions): Config {
       contextOptions,
       cdpEndpoint: cliOptions.cdpEndpoint,
       cdpHeaders: cliOptions.cdpHeader,
+      initPage: cliOptions.initPage,
       initScript: cliOptions.initScript,
     },
     server: {
@@ -235,6 +250,7 @@ export function configFromCLIOptions(cliOptions: CLIOptions): Config {
     saveVideo: cliOptions.saveVideo,
     secrets: cliOptions.secrets,
     sharedBrowserContext: cliOptions.sharedBrowserContext,
+    snapshot: cliOptions.snapshotMode ? { mode: cliOptions.snapshotMode } : undefined,
     outputDir: cliOptions.outputDir,
     imageResponses: cliOptions.imageResponses,
     testIdAttribute: cliOptions.testIdAttribute,
@@ -264,6 +280,9 @@ function configFromEnv(): Config {
   options.headless = envToBoolean(process.env.PLAYWRIGHT_MCP_HEADLESS);
   options.host = envToString(process.env.PLAYWRIGHT_MCP_HOST);
   options.ignoreHttpsErrors = envToBoolean(process.env.PLAYWRIGHT_MCP_IGNORE_HTTPS_ERRORS);
+  const initPage = envToString(process.env.PLAYWRIGHT_MCP_INIT_PAGE);
+  if (initPage)
+    options.initPage = [initPage];
   const initScript = envToString(process.env.PLAYWRIGHT_MCP_INIT_SCRIPT);
   if (initScript)
     options.initScript = [initScript];
@@ -373,6 +392,10 @@ function mergeConfig(base: FullConfig, overrides: Config): FullConfig {
     server: {
       ...pickDefined(base.server),
       ...pickDefined(overrides.server),
+    },
+    snapshot: {
+      ...pickDefined(base.snapshot),
+      ...pickDefined(overrides.snapshot),
     },
     timeouts: {
       ...pickDefined(base.timeouts),

@@ -108,6 +108,11 @@ element.
 
 Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between Playwright's current cursor position and the provided destination. When set to 1, emits a single `mousemove` event at the destination location.
 
+## input-drag-steps
+- `steps` <[int]>
+
+Defaults to 1. Sends `n` interpolated `mousemove` events to represent travel between the `mousedown` and `mouseup` of the drag. When set to 1, emits a single `mousemove` event at the destination location.
+
 ## input-modifiers
 - `modifiers` <[Array]<[KeyboardModifier]<"Alt"|"Control"|"ControlOrMeta"|"Meta"|"Shift">>>
 
@@ -1073,8 +1078,7 @@ Close the browser process on SIGHUP. Defaults to `true`.
 
 Whether to run browser in headless mode. More details for
 [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and
-[Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true` unless the
-[`option: BrowserType.launch.devtools`] option is `true`.
+[Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
 
 ## js-python-browser-option-firefoxuserprefs
 * langs: js, python
@@ -1112,13 +1116,6 @@ disable timeout.
 
 If specified, traces are saved into this directory.
 
-## browser-option-devtools
-* deprecated: Use [debugging tools](../debug.md) instead.
-- `devtools` <[boolean]>
-
-**Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the
-[`option: headless`] option will be set `false`.
-
 ## browser-option-slowmo
 - `slowMo` <[float]>
 
@@ -1128,7 +1125,6 @@ Slows down Playwright operations by the specified amount of milliseconds. Useful
 - %%-browser-option-args-%%
 - %%-browser-option-channel-%%
 - %%-browser-option-chromiumsandbox-%%
-- %%-browser-option-devtools-%%
 - %%-browser-option-downloadspath-%%
 - %%-csharp-java-browser-option-env-%%
 - %%-js-browser-option-env-%%

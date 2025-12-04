@@ -873,7 +873,9 @@ interface TestConfig<TestArgs = {}, WorkerArgs = {}> {
    * - A module name like `'my-awesome-reporter'`.
    * - A relative path to the reporter like `'./reporters/my-awesome-reporter.js'`.
    *
-   * You can pass options to the reporter in a tuple like `['json', { outputFile: './report.json' }]`.
+   * You can pass options to the reporter in a tuple like `['json', { outputFile: './report.json' }]`. If the property
+   * is not specified, Playwright uses the `'dot'` reporter when the CI environment variable is set, and the `'list'`
+   * reporter otherwise.
    *
    * Learn more in the [reporters guide](https://playwright.dev/docs/test-reporters).
    *
@@ -987,6 +989,31 @@ interface TestConfig<TestArgs = {}, WorkerArgs = {}> {
    *   use: {
    *     baseURL: 'http://localhost:3000',
    *   },
+   * });
+   * ```
+   *
+   * If your webserver runs on varying ports, use `wait` to capture the port:
+   *
+   * ```js
+   * import { defineConfig } from '@playwright/test';
+   *
+   * export default defineConfig({
+   *   webServer: {
+   *     command: 'npm run start',
+   *     wait: {
+   *       stdout: '/Listening on port (?<my_server_port>\\d+)/'
+   *     },
+   *   },
+   * });
+   * ```
+   *
+   * ```js
+   * import { test, expect } from '@playwright/test';
+   *
+   * test.use({ baseUrl: `http://localhost:${process.env.MY_SERVER_PORT ?? 3000}` });
+   *
+   * test('homepage', async ({ page }) => {
+   *   await page.goto('/');
    * });
    * ```
    *
@@ -6720,9 +6747,7 @@ export interface PlaywrightWorkerOptions {
   /**
    * Whether to run browser in headless mode. More details for
    * [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and
-   * [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true` unless the
-   * [`devtools`](https://playwright.dev/docs/api/class-browsertype#browser-type-launch-option-devtools) option is
-   * `true`.
+   * [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
    *
    * **Usage**
    *
@@ -10193,14 +10218,22 @@ interface TestConfigWebServer {
   stdout?: "pipe"|"ignore";
 
   /**
-   * Consider command started only when given output has been produced or a time in milliseconds has passed.
+   * Consider command started only when given output has been produced.
    */
   wait?: {
+    /**
+     * Regular expression to wait for in the `stdout` of the command output. Named capture groups are stored in the
+     * environment, for example `/Listening on port (?<my_server_port>\\d+)/` will store the port number in
+     * `process.env['MY_SERVER_PORT']`.
+     */
     stdout?: RegExp;
 
+    /**
+     * Regular expression to wait for in the `stderr` of the command output. Named capture groups are stored in the
+     * environment, for example `/Listening on port (?<my_server_port>\\d+)/` will store the port number in
+     * `process.env['MY_SERVER_PORT']`.
+     */
     stderr?: RegExp;
-
-    time?: number;
   };
 
   /**
