@@ -18,7 +18,6 @@ import common from './tools/common';
 import console from './tools/console';
 import dialogs from './tools/dialogs';
 import evaluate from './tools/evaluate';
-import execute from './tools/execute';
 import files from './tools/files';
 import form from './tools/form';
 import install from './tools/install';
@@ -43,7 +42,6 @@ export const browserTools: Tool<any>[] = [
   ...console,
   ...dialogs,
   ...evaluate,
-  ...execute,
   ...files,
   ...form,
   ...install,
