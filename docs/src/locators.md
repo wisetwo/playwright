@@ -858,7 +858,7 @@ page.getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
         .setHasText(Pattern.compile("Product 2")))
     .getByRole(AriaRole.BUTTON,
-               new Page.GetByRoleOptions().setName("Add to cart"))
+               new Locator.GetByRoleOptions().setName("Add to cart"))
     .click();
 ```
 
@@ -986,7 +986,7 @@ await expect(page
 assertThat(page
     .getByRole(AriaRole.LISTITEM)
     .filter(new Locator.FilterOptions()
-        .setHas(page.GetByRole(AriaRole.HEADING,
+        .setHas(page.getByRole(AriaRole.HEADING,
                                new Page.GetByRoleOptions().setName("Product 2")))))
     .hasCount(1);
 ```
