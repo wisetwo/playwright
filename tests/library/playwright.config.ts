@@ -142,17 +142,20 @@ for (const browserName of browserNames) {
     }
   };
 
-  config.projects.push({
+  const libraryProject = {
     name: `${browserName}-library`,
     testDir: path.join(testDir, 'library'),
     ...projectTemplate,
-  });
+  };
+  config.projects.push(libraryProject);
 
-  config.projects.push({
+  const pageProject = {
     name: `${browserName}-page`,
     testDir: path.join(testDir, 'page'),
     ...projectTemplate,
-  });
+  };
+
+  config.projects.push(pageProject);
 }
 
 export default config;

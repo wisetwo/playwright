@@ -27,6 +27,11 @@ type ElementHandleWaitForSelectorOptionsNotHidden = ElementHandleWaitForSelector
   state?: 'visible'|'attached';
 };
 
+// @ts-ignore this will be any if zod is not installed
+type ZodTypeAny = import('zod').ZodTypeAny;
+// @ts-ignore this will be any if zod is not installed
+type ZodInfer<T extends ZodTypeAny> = import('zod').infer<T>;
+
 /**
  * Page provides methods to interact with a single tab in a [Browser](https://playwright.dev/docs/api/class-browser),
  * or an [extension background page](https://developer.chrome.com/extensions/background_pages) in Chromium. One
@@ -1013,6 +1018,24 @@ export interface Page {
      */
     behavior?: 'wait'|'ignoreErrors'|'default'
   }): Promise<void>;
+
+  /**
+   * Extract information from the page using the agentic loop, return it in a given Zod format.
+   *
+   * **Usage**
+   *
+   * ```js
+   * await page.extract('List of items in the cart', z.object({
+   *   title: z.string().describe('Item title to extract'),
+   *   price: z.string().describe('Item price to extract'),
+   * }).array());
+   * ```
+   *
+   * @param query Task to perform using agentic loop.
+   * @param schema
+   * @param options
+   */
+  extract<Schema extends ZodTypeAny>(query: string, schema: Schema): Promise<ZodInfer<Schema>>;
   /**
    * Emitted when the page closes.
    */
@@ -3795,6 +3818,45 @@ export interface Page {
      */
     width?: string|number;
   }): Promise<Buffer>;
+
+  /**
+   * Perform action using agentic loop.
+   *
+   * **Usage**
+   *
+   * ```js
+   * await page.perform('Click submit button');
+   * ```
+   *
+   * @param task Task to perform using agentic loop.
+   * @param options
+   */
+  perform(task: string, options?: {
+    /**
+     * All the agentic actions are converted to the Playwright calls and are cached. By default, they are cached globally
+     * with the `task` as a key. This option allows controlling the cache key explicitly.
+     */
+    key?: string;
+
+    /**
+     * Maximum number of tokens to consume. The agentic loop will stop after input + output tokens exceed this value.
+     * Defaults to context-wide value specified in `agent` property.
+     */
+    maxTokens?: number;
+
+    /**
+     * Maximum number of agentic turns during this call, defaults to context-wide value specified in `agent` property.
+     */
+    maxTurns?: number;
+  }): Promise<{
+    usage: {
+      turns: number;
+
+      inputTokens: number;
+
+      outputTokens: number;
+    };
+  }>;
 
   /**
    * **NOTE** Use locator-based [locator.press(key[, options])](https://playwright.dev/docs/api/class-locator#locator-press)
@@ -22032,6 +22094,48 @@ export interface BrowserContextOptions {
    * Whether to automatically download all the attachments. Defaults to `true` where all the downloads are accepted.
    */
   acceptDownloads?: boolean;
+
+  /**
+   * Agent settings for [page.perform(task[, options])](https://playwright.dev/docs/api/class-page#page-perform) and
+   * [page.extract(query, schema[, options])](https://playwright.dev/docs/api/class-page#page-extract).
+   */
+  agent?: {
+    /**
+     * LLM provider to use.
+     */
+    provider: string;
+
+    /**
+     * Model identifier within provider.
+     */
+    model: string;
+
+    /**
+     * Cache file to use/generate code for performed actions into. Cache is not used if not specified (default).
+     */
+    cacheFile?: string;
+
+    /**
+     * Cache control, defaults to 'auto'.
+     */
+    cacheMode?: 'force'|'ignore'|'auto';
+
+    /**
+     * Secrets to hide from the LLM.
+     */
+    secrets?: { [key: string]: string; };
+
+    /**
+     * Maximum number of agentic turns to take per call. Defaults to 10.
+     */
+    maxTurns?: number;
+
+    /**
+     * Maximum number of tokens to consume per call. The agentic loop will stop after input + output tokens exceed this
+     * value. Defaults on unlimited.
+     */
+    maxTokens?: number;
+  };
 
   /**
    * When using [page.goto(url[, options])](https://playwright.dev/docs/api/class-page#page-goto),

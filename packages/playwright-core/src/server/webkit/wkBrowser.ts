@@ -78,7 +78,7 @@ export class WKBrowser extends Browser {
       wkPage.didClose();
     this._wkPages.clear();
     for (const video of this._idToVideo.values())
-      video.artifact.reportFinished(new TargetClosedError());
+      video.artifact.reportFinished(new TargetClosedError(this.closeReason()));
     this._idToVideo.clear();
     this._didClose();
   }
@@ -374,7 +374,7 @@ export class WKBrowserContext extends BrowserContext {
 
   async doClose(reason: string | undefined) {
     if (!this._browserContextId) {
-      await Promise.all(this._wkPages().map(wkPage => wkPage._stopVideo()));
+      await Promise.all(this._wkPages().map(wkPage => wkPage._page.screencast.stopVideoRecording()));
       // Closing persistent context should close the browser.
       await this._browser.close({ reason });
     } else {
